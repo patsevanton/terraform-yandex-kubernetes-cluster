@@ -48,13 +48,13 @@ resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
   depends_on = [
     yandex_resourcemanager_folder_iam_member.editor
   ]
-  folder_id          = var.folder_id
-  name               = var.cluster_name
-  description        = var.cluster_name
-  cluster_ipv4_range = var.cluster_ipv4_range
-  service_ipv4_range = var.service_ipv4_range
-  network_id         = var.network_id
-  node_ipv4_cidr_mask_size  =var.node_ipv4_cidr_mask_size
+  folder_id                = var.folder_id
+  name                     = var.cluster_name
+  description              = var.cluster_name
+  cluster_ipv4_range       = var.cluster_ipv4_range
+  service_ipv4_range       = var.service_ipv4_range
+  network_id               = var.network_id
+  node_ipv4_cidr_mask_size = var.node_ipv4_cidr_mask_size
 
   dynamic "network_implementation" {
     for_each = var.cilium ? [1] : []
@@ -89,8 +89,8 @@ resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
         subnet_id = var.subnet_id
       }
     }
-    version = var.version_k8s
-    public_ip = var.public_ip
+    version            = var.version_k8s
+    public_ip          = var.public_ip
     security_group_ids = var.security_group_ids
 
     maintenance_policy {

@@ -2,7 +2,6 @@ variable "zone" {
   type        = string
   default     = null
   description = "Zone of yandex cloud"
-
 }
 
 variable "cloud_id" {
@@ -60,15 +59,14 @@ variable "subnet_id" {
 }
 
 variable "cluster_ipv4_range" {
-  type    = string
-  default = "10.240.0.0/16"
-  description = "MAGNIT range  for PODS"
+  type        = string
+  default     = "10.1.0.0/16"
+
 }
 
 variable "service_ipv4_range" {
-  type    = string
-  default = "10.241.0.0/16"
-  description = "MAGNIT range  for SERVICE"
+  type        = string
+  default     = "10.2.0.0/16"
 }
 
 variable "vpc_folder_id" {
