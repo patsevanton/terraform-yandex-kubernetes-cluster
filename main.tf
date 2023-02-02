@@ -1,100 +1,116 @@
-# SA twoingress-k8s-cluster
-resource "yandex_iam_service_account" "twoingress-k8s-cluster" {
-  folder_id = var.folder_id
-  name      = "twoingress-k8s-cluster"
+resource "yandex_iam_service_account" "k8s" {
+  name        = "k8s-${var.cluster_name}"
+  description = "service account for kubernetes"
+  folder_id   = var.folder_id
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "twoingress-k8s-cluster-agent-permissions" {
+resource "yandex_resourcemanager_folder_iam_member" "editor" {
   folder_id = var.folder_id
-  role      = "k8s.clusters.agent"
-  member    = "serviceAccount:${yandex_iam_service_account.twoingress-k8s-cluster.id}"
+  role      = "editor"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "twoingress-vpc-publicAdmin-permissions" {
+resource "yandex_resourcemanager_folder_iam_member" "k8s-admin" {
   folder_id = var.folder_id
+  role      = "k8s.admin"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vpc-editor" {
+  count     = var.vpc_folder_id != "" ? 1 : 0
+  folder_id = var.vpc_folder_id
+  role      = "editor"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vpc-k8s-clusters-agent" {
+  count     = var.vpc_folder_id != "" ? 1 : 0
+  folder_id = var.vpc_folder_id
+  role      = var.cilium ? "k8s.tunnelClusters.agent" : "k8s.clusters.agent"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vpc-user" {
+  count     = var.vpc_folder_id != "" ? 1 : 0
+  folder_id = var.vpc_folder_id
+  role      = "vpc.user"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vpc-publicAdmin" {
+  count     = var.vpc_folder_id != "" ? 1 : 0
+  folder_id = var.vpc_folder_id
   role      = "vpc.publicAdmin"
-  member    = "serviceAccount:${yandex_iam_service_account.twoingress-k8s-cluster.id}"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "twoingress-load-balancer-admin-permissions" {
-  folder_id = var.folder_id
-  role      = "load-balancer.admin"
-  member    = "serviceAccount:${yandex_iam_service_account.twoingress-k8s-cluster.id}"
-}
+resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
+  depends_on = [
+    yandex_resourcemanager_folder_iam_member.editor
+  ]
+  folder_id          = var.folder_id
+  name               = var.cluster_name
+  description        = var.cluster_name
+  cluster_ipv4_range = var.cluster_ipv4_range
+  service_ipv4_range = var.service_ipv4_range
+  network_id         = var.network_id
+  node_ipv4_cidr_mask_size  =var.node_ipv4_cidr_mask_size
 
-# SA k8s-node-group
-resource "yandex_iam_service_account" "twoingress-k8s-node-group" {
-  folder_id = var.folder_id
-  name      = "twoingress-k8s-node-group"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "twoingress-k8s-node-group-permissions" {
-  folder_id = var.folder_id
-  role      = "container-registry.images.puller"
-  member    = "serviceAccount:${yandex_iam_service_account.twoingress-k8s-node-group.id}"
-}
-
-resource "yandex_kubernetes_cluster" "regional_cluster_resource_name" {
-  name        = "name"
-  description = "description"
-
-  network_id = var.network_id
+  dynamic "network_implementation" {
+    for_each = var.cilium ? [1] : []
+    content {
+      cilium {}
+    }
+  }
 
   master {
-    regional {
-      region = "ru-central1"
-
-      location {
-        zone      = yandex_vpc_subnet.subnet_a_resource_name.zone
-        subnet_id = yandex_vpc_subnet.subnet_a_resource_name.id
-      }
-
-      location {
-        zone      = yandex_vpc_subnet.subnet_b_resource_name.zone
-        subnet_id = yandex_vpc_subnet.subnet_b_resource_name.id
-      }
-
-      location {
-        zone      = yandex_vpc_subnet.subnet_c_resource_name.zone
-        subnet_id = yandex_vpc_subnet.subnet_c_resource_name.id
+    dynamic "regional" {
+      for_each = var.cluster_type == "regional" ? [0] : []
+      content {
+        region = "ru-central1"
+        location {
+          zone      = "ru-central1-a"
+          subnet_id = var.zone_a_subnet_id
+        }
+        location {
+          zone      = "ru-central1-b"
+          subnet_id = var.zone_b_subnet_id
+        }
+        location {
+          zone      = "ru-central1-c"
+          subnet_id = var.zone_c_subnet_id
+        }
       }
     }
-
-    version   = var.version
-    public_ip = var.public_ip_enable
+    dynamic "zonal" {
+      for_each = var.cluster_type == "zonal" ? [0] : []
+      content {
+        zone      = var.zone
+        subnet_id = var.subnet_id
+      }
+    }
+    version = var.version_k8s
+    public_ip = var.public_ip
+    security_group_ids = var.security_group_ids
 
     maintenance_policy {
-      auto_upgrade = var.auto_upgrade_enable
+      auto_upgrade = true
 
       maintenance_window {
-        day        = "monday"
-        start_time = "15:00"
+        start_time = "00:00"
         duration   = "3h"
       }
-
-      maintenance_window {
-        day        = "friday"
-        start_time = "10:00"
-        duration   = "4h30m"
-      }
-    }
-
-    master_logging {
-      enabled                    = true
-      folder_id                  = var.folder_id
-      kube_apiserver_enabled     = var.kube_apiserver_enabled
-      cluster_autoscaler_enabled = var.cluster_autoscaler_enabled
-      events_enabled             = var.events_enabled
     }
   }
 
-  service_account_id      = var.service_account_id
-  node_service_account_id = var.node_service_account_id
+  service_account_id      = yandex_iam_service_account.k8s.id
+  node_service_account_id = yandex_iam_service_account.k8s.id
 
   labels = {
-    my_key       = "my_value"
-    my_other_key = "my_other_value"
+    env = var.cluster_name
   }
 
-  release_channel = var.release_channel
+  release_channel         = var.release_channel
+  network_policy_provider = var.cilium ? null : "CALICO"
+
 }
