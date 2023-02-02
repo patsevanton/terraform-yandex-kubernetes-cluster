@@ -195,3 +195,34 @@ variable "secondary_disk" {
   type        = map(map(string))
   default     = {}
 }
+
+
+######
+variable "network_id" {
+  type = string
+}
+
+variable "version" {
+  type = string
+}
+variable "public_ip_enable" {
+  type = bool
+}
+variable "auto_upgrade_enable" {
+  type = bool
+}
+variable "kube_apiserver_enabled" {
+  type = bool
+}
+variable "cluster_autoscaler_enabled" {
+  type = bool
+}
+variable "events_enabled" {
+  type = bool
+}
+variable "node_service_account_id" {
+  type = string
+}
+variable "release_channel" {
+  type = string
+}
