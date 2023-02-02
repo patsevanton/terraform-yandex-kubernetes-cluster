@@ -19,9 +19,8 @@ variable "cluster_id" {
 }
 
 variable "cilium" {
-  type        = bool
-  default     = false
-  description = "Используем cilium для сети"
+  type    = bool
+  default = false
 }
 variable "service_account_id" {
   type    = string
@@ -59,14 +58,13 @@ variable "subnet_id" {
 }
 
 variable "cluster_ipv4_range" {
-  type        = string
-  default     = "10.1.0.0/16"
-
+  type    = string
+  default = "10.1.0.0/16"
 }
 
 variable "service_ipv4_range" {
-  type        = string
-  default     = "10.2.0.0/16"
+  type    = string
+  default = "10.2.0.0/16"
 }
 
 variable "vpc_folder_id" {
