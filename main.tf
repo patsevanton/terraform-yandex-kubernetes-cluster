@@ -4,49 +4,36 @@ resource "yandex_iam_service_account" "k8s" {
   folder_id   = var.folder_id
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "editor" {
+resource "yandex_resourcemanager_folder_iam_member" "k8s-cluster-agent" {
   folder_id = var.folder_id
-  role      = "editor"
+  role      = "k8s.clusters.agent"
   member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "k8s-admin" {
+resource "yandex_resourcemanager_folder_iam_member" "load-balancer-admin" {
   folder_id = var.folder_id
-  role      = "k8s.admin"
+  role      = "load-balancer.admin"
   member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
 
-#resource "yandex_resourcemanager_folder_iam_member" "vpc-editor" {
-#  count     = var.vpc_folder_id != "" ? 1 : 0
-#  folder_id = var.vpc_folder_id
-#  role      = "editor"
-#  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
-#}
+resource "yandex_resourcemanager_folder_iam_member" "vpc-user" {
+  folder_id = var.folder_id
+  role      = "vpc.user"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
 
-#resource "yandex_resourcemanager_folder_iam_member" "vpc-k8s-clusters-agent" {
-#  count     = var.vpc_folder_id != "" ? 1 : 0
-#  folder_id = var.vpc_folder_id
-#  role      = var.cilium ? "k8s.tunnelClusters.agent" : "k8s.clusters.agent"
-#  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
-#}
-#
-#resource "yandex_resourcemanager_folder_iam_member" "vpc-user" {
-#  count     = var.vpc_folder_id != "" ? 1 : 0
-#  folder_id = var.vpc_folder_id
-#  role      = "vpc.user"
-#  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
-#}
-#
-#resource "yandex_resourcemanager_folder_iam_member" "vpc-publicAdmin" {
-#  count     = var.vpc_folder_id != "" ? 1 : 0
-#  folder_id = var.vpc_folder_id
-#  role      = "vpc.publicAdmin"
-#  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
-#}
+resource "yandex_resourcemanager_folder_iam_member" "vpc-publicAdmin" {
+  folder_id = var.folder_id
+  role      = "vpc.publicAdmin"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
 
 resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
   depends_on = [
-    yandex_resourcemanager_folder_iam_member.editor
+    yandex_resourcemanager_folder_iam_member.k8s-cluster-agent,
+    yandex_resourcemanager_folder_iam_member.load-balancer-admin,
+    yandex_resourcemanager_folder_iam_member.vpc-publicAdmin,
+    y
   ]
   folder_id                = var.folder_id
   name                     = var.cluster_name
