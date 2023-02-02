@@ -117,3 +117,18 @@ variable "zone_c_subnet_id" {
   type    = string
   default = null
 }
+
+variable "auto_upgrade_enable" {
+  type    = bool
+  default = true
+}
+
+variable "maintenance_window_start_time" {
+  type    = string
+  default = "00:00"
+}
+
+variable "maintenance_window_duration" {
+  type    = string
+  default = "3h"
+}

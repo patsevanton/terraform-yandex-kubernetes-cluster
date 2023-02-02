@@ -94,11 +94,11 @@ resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
     security_group_ids = var.security_group_ids
 
     maintenance_policy {
-      auto_upgrade = true
+      auto_upgrade = var.auto_upgrade_enable
 
       maintenance_window {
-        start_time = "00:00"
-        duration   = "3h"
+        start_time = var.maintenance_window_start_time
+        duration   = var.maintenance_window_duration
       }
     }
   }
