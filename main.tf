@@ -45,18 +45,18 @@ resource "yandex_kubernetes_cluster" "regional_cluster_resource_name" {
       region = "ru-central1"
 
       location {
-        zone      = "${yandex_vpc_subnet.subnet_a_resource_name.zone}"
-        subnet_id = "${yandex_vpc_subnet.subnet_a_resource_name.id}"
+        zone      = yandex_vpc_subnet.subnet_a_resource_name.zone
+        subnet_id = yandex_vpc_subnet.subnet_a_resource_name.id
       }
 
       location {
-        zone      = "${yandex_vpc_subnet.subnet_b_resource_name.zone}"
-        subnet_id = "${yandex_vpc_subnet.subnet_b_resource_name.id}"
+        zone      = yandex_vpc_subnet.subnet_b_resource_name.zone
+        subnet_id = yandex_vpc_subnet.subnet_b_resource_name.id
       }
 
       location {
-        zone      = "${yandex_vpc_subnet.subnet_c_resource_name.zone}"
-        subnet_id = "${yandex_vpc_subnet.subnet_c_resource_name.id}"
+        zone      = yandex_vpc_subnet.subnet_c_resource_name.zone
+        subnet_id = yandex_vpc_subnet.subnet_c_resource_name.id
       }
     }
 
@@ -80,11 +80,11 @@ resource "yandex_kubernetes_cluster" "regional_cluster_resource_name" {
     }
 
     master_logging {
-      enabled = true
-      folder_id = var.folder_id
-      kube_apiserver_enabled = var.kube_apiserver_enabled
+      enabled                    = true
+      folder_id                  = var.folder_id
+      kube_apiserver_enabled     = var.kube_apiserver_enabled
       cluster_autoscaler_enabled = var.cluster_autoscaler_enabled
-      events_enabled = var.events_enabled
+      events_enabled             = var.events_enabled
     }
   }
 
