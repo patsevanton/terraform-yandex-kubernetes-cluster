@@ -67,10 +67,10 @@ variable "service_ipv4_range" {
   default = "10.2.0.0/16"
 }
 
-variable "vpc_folder_id" {
-  type    = string
-  default = ""
-}
+#variable "vpc_folder_id" {
+#  type    = string
+#  default = ""
+#}
 
 variable "release_channel" {
   type    = string
