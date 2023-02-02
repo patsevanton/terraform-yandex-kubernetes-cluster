@@ -34,7 +34,7 @@ variable "node_service_account_id" {
 
 variable "version_k8s" {
   type    = string
-  default = null
+  default = "1.23"
 }
 
 variable "k8s_name" {
@@ -69,7 +69,7 @@ variable "service_ipv4_range" {
 
 variable "release_channel" {
   type    = string
-  default = "REGULAR"
+  default = "STABLE"
 }
 
 variable "public_ip" {
