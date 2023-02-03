@@ -4,6 +4,12 @@ resource "yandex_iam_service_account" "k8s" {
   folder_id   = var.folder_id
 }
 
+resource "time_sleep" "k8s" {
+  create_duration = "20s"
+  depends_on      = [yandex_iam_service_account.k8s]
+}
+
+
 resource "yandex_resourcemanager_folder_iam_member" "k8s-cluster-agent" {
   folder_id = var.folder_id
   role      = "k8s.clusters.agent"
@@ -30,6 +36,7 @@ resource "yandex_resourcemanager_folder_iam_member" "vpc-publicAdmin" {
 
 resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
   depends_on = [
+    time_sleep.k8s,
     yandex_resourcemanager_folder_iam_member.k8s-cluster-agent,
     yandex_resourcemanager_folder_iam_member.load-balancer-admin,
     yandex_resourcemanager_folder_iam_member.vpc-user,
