@@ -32,8 +32,8 @@ resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
   depends_on = [
     yandex_resourcemanager_folder_iam_member.k8s-cluster-agent,
     yandex_resourcemanager_folder_iam_member.load-balancer-admin,
+    yandex_resourcemanager_folder_iam_member.vpc-user,
     yandex_resourcemanager_folder_iam_member.vpc-publicAdmin,
-    y
   ]
   folder_id                = var.folder_id
   name                     = var.cluster_name
