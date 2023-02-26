@@ -10,7 +10,6 @@ resource "time_sleep" "k8s" {
   depends_on      = [yandex_iam_service_account.k8s]
 }
 
-
 resource "yandex_resourcemanager_folder_iam_member" "k8s-cluster-agent" {
   folder_id = var.folder_id
   role      = "k8s.clusters.agent"
