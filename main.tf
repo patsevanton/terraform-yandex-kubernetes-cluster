@@ -38,7 +38,7 @@ resource "yandex_resourcemanager_folder_iam_member" "vpc-publicAdmin" {
 ### service account for nodes
 resource "yandex_iam_service_account" "sa-k8s-node-group" {
   folder_id = var.folder_id
-  name      = "sa-k8s-node-group"
+  name      = "k8s-node-${var.cluster_name}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "sa-k8s-node-group-permissions" {
