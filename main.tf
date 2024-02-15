@@ -84,8 +84,8 @@ resource "yandex_kubernetes_cluster" "zonal_cluster_resource_name" {
           subnet_id = var.zone_b_subnet_id
         }
         location {
-          zone      = "ru-central1-c"
-          subnet_id = var.zone_c_subnet_id
+          zone      = "ru-central1-d"
+          subnet_id = var.zone_d_subnet_id
         }
       }
     }

@@ -113,6 +113,11 @@ variable "zone_c_subnet_id" {
   default = null
 }
 
+variable "zone_d_subnet_id" {
+  type    = string
+  default = null
+}
+
 variable "auto_upgrade_enable" {
   type    = bool
   default = true
